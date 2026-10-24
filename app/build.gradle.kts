@@ -96,6 +96,10 @@ dependencies {
     testImplementation(libs.kotest.property)
     robolectricRuntime(libs.robolectric.android.all)
 
+    constraints {
+        libs.bundles.build.tool.security.floors.get().forEach { add("androidLintTool", it) }
+    }
+
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(platform(libs.compose.bom))

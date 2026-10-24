@@ -9,4 +9,9 @@ buildscript {
     configurations.classpath {
         resolutionStrategy.activateDependencyLocking()
     }
+    dependencies {
+        constraints {
+            libs.bundles.build.tool.security.floors.get().forEach { classpath(it) }
+        }
+    }
 }
