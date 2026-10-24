@@ -76,17 +76,18 @@ Only dependencies the plan lists may be added. After changing `gradle/libs.versi
 regenerate the lockfiles and checksums, then audit:
 
 ```sh
-export GRADLE_USER_HOME="$(mktemp -d)"   # an empty cache, so every file is downloaded and recorded
 rm gradle/verification-metadata.xml
+export GRADLE_USER_HOME="$(mktemp -d)"   # empty cache: every file is downloaded and recorded
 ./gradlew resolveAndLockAll --write-locks --write-verification-metadata sha256
-./gradlew clean
-./gradlew build connectedDebugAndroidTest --write-verification-metadata sha256   # emulator running
+export GRADLE_USER_HOME="$(mktemp -d)"   # a second empty cache, now with the new locks in force
+./gradlew clean build connectedDebugAndroidTest --write-verification-metadata sha256   # emulator running
 unset GRADLE_USER_HOME
 osv-scanner scan source -r .
 ```
 
-With a warm cache Gradle can leave parent POMs and BOMs out of the metadata, and a fresh
-clone then fails verification.
+Both passes need an empty cache: with a warm one Gradle leaves parent POMs and BOMs out of
+the metadata. The second pass is needed because a locked build fetches some POMs and BOMs
+that the lock-writing pass never touches; without them a fresh clone fails verification.
 
 Review the diff of `gradle/verification-metadata.xml` and the lockfiles before committing.
 The `[bundles] build-tool-security-floors` entries in the catalog lift libraries that AGP and
