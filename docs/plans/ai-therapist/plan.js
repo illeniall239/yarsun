@@ -3106,10 +3106,10 @@ window.NAQSHA = {
     },
     {
       "name": "Tooling: detekt, Semgrep, gitleaks, OSV-Scanner, MobSF (CI/dev only, not shipped)",
-      "version": "detekt 1.23.8; others pinned in S1",
+      "version": "detekt 2.0.0-alpha.6 (plugin id dev.detekt); others pinned in S1",
       "why": "Security checks (D10)",
       "license": "Apache-2.0 / LGPL (Semgrep CE) / MIT / Apache-2.0 / GPL-3.0 (run as a tool, not linked)",
-      "health": "Active; detekt 1.23.8 + Kotlin 2.4 compatibility checked in S1",
+      "health": "Active; detekt 1.23.8 + Kotlin 2.4 compatibility checked in S1 Update 2026-10-24 (S1): detekt 1.23.8 crashes on JDK 25 (JavaVersion.parse); maintainer on detekt#9772: \"Java 25 is supported in the 2.0.0 alphas. Support will not be backported to 1.x.\" 2.0.0-alpha.6 released 2026-08-04 (pre-release), dev-only, pinned by lockfile and verification metadata.",
       "insteadOf": "-"
     },
     {
@@ -3297,9 +3297,18 @@ window.NAQSHA = {
   "steps": [
     {
       "dependsOn": [],
-      "status": "todo",
-      "notes": "",
-      "checkpoint": null,
+      "status": "doing",
+      "notes": "Baseline (run-like-a-user): new app, nothing to run or walk yet; no inherited breakage. Toolchain installed in home folder (see LEARNINGS.md). Repo initialised on main (plan commit 946d7b0), build branch build/ai-therapist. S1 worker started in worktree crew/ai-therapist/S1.\nWorker (2 rounds). Versions: Gradle 9.8.2 (dist SHA-256 checked), AGP 9.4.1, Kotlin 2.4.21 (KGP lifted from AGP-bundled 2.2.10 via root apply false), Compose BOM 2026.09.00 (ui 1.12.1, material3 1.4.0), compileSdk 37 (required by Compose ui 1.12.1), targetSdk 36, minSdk 31; detekt 2.0.0-alpha.6 (user decision). LiteRT-LM 0.18.1 minSdk 24 (AAR manifest, Google Maven) <= D12 31. Red runs: tamper test `Dependency verification failed for configuration :app:debugRuntimeClasspath  One artifact failed verification: activity-1.13.0.aar` (on final metadata 2c24847, sha256 2c91557c...); placeholder test broken on purpose: `Assert failed: ... contains YarSun ... is not displayed!`; detekt planted EmptyCatchBlock/SwallowedException/FunctionNaming caught. Worker checks: ./gradlew check pass (3d1e512 tree), testDebugUnitTest pass tests=1, lintDebug pass, detekt pass, connectedDebugAndroidTest pass tests=1, semgrep p/kotlin+p/mobsfscan 0 findings, gitleaks 9 commits no leaks, osv-scanner No issues found (after build-tool floors: bouncycastle 1.86, jose4j 0.9.7, jdom2 2.0.6.1, commons-lang3 3.21.0, httpclient 4.5.14), actionlint 1.7.12 0 errors. Fresh-clone empty-cache check on final metadata: NOT run by worker; given to the independent reviewer. CI: not run (no remote).\nIndependent review round 1 (diff 946d7b0..2c24847): PASS. Reviewer fresh clone + empty GRADLE_USER_HOME: ./gradlew check BUILD SUCCESSFUL in 6m 45s; connectedDebugAndroidTest BUILD SUCCESSFUL tests=1; tamper test BUILD FAILED as expected; placeholder broken twice (test and app) FAILED then green; semgrep 58 rules 0 findings; gitleaks 9 commits no leaks; osv-scanner No issues found; actionlint 0 errors; all 4 action SHAs verified with git ls-remote; scanner binary checksums and Semgrep image digest verified. Finding F1 (non-blocking, fixing): buildscript and settings lockfiles in DEFAULT lock mode; deleting buildscript-gradle.lockfile still builds. Scope note: Kotlin allWarningsAsErrors on (matches warnings-as-errors policy, kept). Not checked: CI run (no remote), Semgrep docker image run, MobSF (S18).\nF1 fix (5bd8dbb): root buildscript classpath STRICT. Before: rm buildscript-gradle.lockfile && ./gradlew help -> BUILD SUCCESSFUL in 2s. After: `Locking strict mode: Configuration classpath is locked but does not have lock state.` Settings classpath left in DEFAULT mode: STRICT is impossible with a version catalog (gradle/gradle#23727, open, checked 2026-10-24); it is empty, and verification metadata rejects a planted settings plugin (`Dependency verification failed ... foojay-resolver-convention...pom`). Coordinator decision (no change to T16 controls): accept, with a comment in settings.gradle.kts. ./gradlew check --rerun-tasks pass; gitleaks pass; locks and metadata unchanged.",
+      "checkpoint": {
+        "at": "2026-10-24T14:17:52.593Z",
+        "did": "F1 fixed in 5bd8dbb (root STRICT; settings cannot, gradle#23727; covered by verification metadata). Reviewer round 2 asked to re-check F1.",
+        "red": "before/after lockfile-deletion lines in notes",
+        "next": "On reviewer PASS: crew.js land S1; strip Co-Authored-By lines from main + build/ai-therapist; verify trees unchanged; gitleaks full history; gh repo create illeniall239/yarsun --public; push; check CI; add learnings; report S1 and wait",
+        "files": [],
+        "open": [
+          "Waiting on reviewer round 2"
+        ]
+      },
       "id": "S1",
       "title": "Project skeleton, tooling and CI",
       "detail": "git init; Android project with Kotlin 2.4, Compose BOM, version catalog, minSdk per D12, targetSdk 36, Gradle lockfile and dependency verification metadata; detekt, Lint warningsAsErrors, test runners (JUnit4, Robolectric, Compose UI test, kotest-property); GitHub Actions with actions pinned to SHAs running unit tests, Lint, detekt, Semgrep, gitleaks, OSV-Scanner and emulator tests; confirm LiteRT-LM's minSdk; README with prerequisites and one-command setup (`./gradlew check`); .gitignore. One placeholder test proves the pipeline.",
@@ -4226,6 +4235,18 @@ window.NAQSHA = {
       "likelihood": "high",
       "impact": "medium",
       "mitigation": "Listed here so the schedule accounts for them"
+    },
+    {
+      "risk": "Google Play will require targetSdk 37 (Android 17); the app stays on 36 with Lint OldTargetApi off until then",
+      "likelihood": "high",
+      "impact": "medium",
+      "mitigation": "When Play announces the API 37 deadline (its target-API page lists 36 by 2026-08-31 as of 2026-10-24), plan a step to research Android 17 behaviour changes, add an API 37 emulator image, move targetSdk to 37 and turn OldTargetApi back on"
+    },
+    {
+      "risk": "detekt 2.0.0-alpha.6 is a pre-release: a rule may misbehave or its config keys may change before 2.0.0",
+      "likelihood": "medium",
+      "impact": "low",
+      "mitigation": "Pinned exactly (lockfile + verification metadata); dev-only, never shipped; move to 2.0.0 stable when released and re-run detekt over the whole codebase"
     }
   ],
   "rejected": [
@@ -4329,6 +4350,11 @@ window.NAQSHA = {
       "date": "2026-10-24",
       "change": "Final review: every threat mitigation and acceptance criterion now has a test that checks it. Added tests for the export KDF floor, minimum passphrase length and passphrase never stored (T8), secure_delete and key-first delete-all (T13), out-of-memory handling (T15), and automated Compose accessibility checks at 200% in both languages (A11, sourced). S1 doneWhen now proves dependency verification fails on a bad checksum (T16). Acceptance ids A5, A7, A13 tagged on the tests that check them.",
       "by": "claude"
+    },
+    {
+      "date": "2026-10-24",
+      "change": "S1 deviation decided by the user: (1) detekt 2.0.0-alpha.6 instead of 1.23.8, which cannot run on JDK 25 (D10 unchanged: detekt still runs); (2) targetSdk stays 36 with Lint OldTargetApi turned off, and a risk added to move to 37 when Play announces its deadline; (3) Lint NewerVersionAvailable and GradleDependency turned off so builds stay reproducible (advisories still covered by OSV-Scanner). Also from S1: compileSdk 37 is required by Compose ui 1.12.1 (targetSdk unaffected); code goes to a new public GitHub repo, illeniall239/yarsun (user choice).",
+      "by": "user"
     }
   ]
 };
