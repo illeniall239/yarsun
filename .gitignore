@@ -1,0 +1,26 @@
+# Gradle and build outputs
+.gradle/
+.kotlin/
+build/
+/captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Machine-specific
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Secrets and signing material never belong in the repository
+*.jks
+*.keystore
+keystore.properties
+.env
+.env.*
+
+# Model files are downloaded or pushed at run time (D7), never committed
+*.litertlm
+*.tflite
