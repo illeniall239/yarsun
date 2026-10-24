@@ -1,3 +1,6 @@
+// The settings classpath is not lock-checked in STRICT mode: with a version catalog, Gradle
+// never writes its lock state (gradle/gradle#23727), so STRICT fails every build. It is
+// empty today, and gradle/verification-metadata.xml still rejects any unlisted artifact.
 pluginManagement {
     repositories {
         google {
