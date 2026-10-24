@@ -76,12 +76,6 @@ detekt {
     source.setFrom("src/main/kotlin", "src/test/kotlin", "src/androidTest/kotlin", "src/sharedTest/kotlin")
 }
 
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-    // detekt 1.23.8 embeds Kotlin 2.0.21, which knows JVM targets up to 22 only;
-    // match the bytecode target the app compiles to.
-    jvmTarget = "17"
-}
-
 dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)

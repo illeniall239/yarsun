@@ -5,7 +5,8 @@ agp = "9.4.1"
 kotlin = "2.4.21"
 composeBom = "2026.09.00"
 activityCompose = "1.13.0"
-detekt = "1.23.8"
+# 2.0 alpha: 1.23.x cannot run on JDK 25 (detekt#9771); chosen by the user in S1.
+detekt = "2.0.0-alpha.6"
 junit = "4.13.2"
 robolectric = "4.17"
 # The Android framework jar Robolectric 4.17 runs SDK 36 tests on; fetched by Gradle
@@ -56,4 +57,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 # plugin with `apply false` in the root build only lifts the compiler to 2.4.x.
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }

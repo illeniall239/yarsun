@@ -28,7 +28,8 @@ sdkmanager "platforms;android-37.0" "build-tools;36.0.0" "platform-tools" \
 ## Setup and test
 
 One command builds the app and runs the unit tests (JUnit 4 + Robolectric + Compose UI
-test), Android Lint with warnings as errors, and detekt:
+test), Android Lint with warnings as errors, and detekt (2.0.0-alpha.6, the first line that
+runs on JDK 25):
 
 ```sh
 ./gradlew check
@@ -77,8 +78,8 @@ regenerate the lockfiles and checksums, then audit:
 ```sh
 export GRADLE_USER_HOME="$(mktemp -d)"   # an empty cache, so every file is downloaded and recorded
 rm gradle/verification-metadata.xml
-./gradlew clean
 ./gradlew resolveAndLockAll --write-locks --write-verification-metadata sha256
+./gradlew clean
 ./gradlew build connectedDebugAndroidTest --write-verification-metadata sha256   # emulator running
 unset GRADLE_USER_HOME
 osv-scanner scan source -r .
@@ -91,6 +92,11 @@ Review the diff of `gradle/verification-metadata.xml` and the lockfiles before c
 The `[bundles] build-tool-security-floors` entries in the catalog lift libraries that AGP and
 Lint pull in at build time above versions with published advisories; they are never part of
 the app.
+
+Lint's online version checks (`NewerVersionAvailable`, `GradleDependency`) are off in
+`app/lint.xml`, so an upstream release never fails an unchanged build. Advisories are
+caught by OSV-Scanner instead, and upgrading is a deliberate change made with the steps
+above.
 
 ## Where things live
 

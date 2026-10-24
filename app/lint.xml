@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <!-- targetSdk 36 is fixed by the plan (docs/plans/ai-therapist, step S1); lint's
-         "a newer API level exists" nag would otherwise fail every warnings-as-errors build. -->
+    <!-- targetSdk 36 is fixed by the plan (docs/plans/ai-therapist, step S1). Plan risk:
+         move to targetSdk 37 when Google Play announces its deadline. -->
     <issue id="OldTargetApi" severity="ignore" />
+    <!-- Reproducible builds: these look up newer releases online, so an upstream release
+         would fail an unchanged build. Advisories are covered by OSV-Scanner; upgrades
+         follow the README's "Changing a dependency" procedure. -->
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
 </lint>
